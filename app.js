@@ -9,6 +9,7 @@ var express = require('express'),
   http = require('http'),
   reload = require('reload'),
   config = require('./config'), //配置文件
+  routers = require('./routers/index'), //路由
   port = config.port, //启动项目端口
   app = module.exports = express(),
   isDev = process.env.NODE_ENV !== 'production'; //是否开发模式
@@ -45,30 +46,11 @@ if (isDev) {
 
   var staticPath = path.posix.join(webpackDevConfig.output.publicPath, webpackDevConfig.output.path)
 
-  app.use(staticPath, express.static('views/asset'))
+  app.use(staticPath, express.static('views/asset'));
 
-  app.get('/', function (req, res, next) {
-    var strHtml = compiler.outputFileSystem.readFileSync(path.join(__dirname, './views/page1_index.html')) + '';
-/*    compiler.outputFileSystem.readFile(path.join(__dirname, './views/page1_index.html'), function(err, result) {
-      if (err) {
-        // something error
-        return next(err);
-      }
-      res.set('content-type', 'text/html');
-      res.send(result);
-      res.end();
-    })*/
-    res.render('frame/index', {
-      html: strHtml,
-      title: 'title'
-    });
-  });
-
-  app.get('/page2', function (req, res) {
-    res.render('page2_index', {
-      title: "page2",
-      page: "page2"
-    });
+  routers(app, isDev, {
+    compiler: compiler,
+    dirname: __dirname
   });
 
   var server = http.createServer(app);
@@ -81,15 +63,14 @@ if (isDev) {
 
 } else {
 
-  // app.set('views', path.join(__dirname, 'views'));
-  // app.use(express.static(path.join(__dirname, 'views/asset')));
+  app.set('views', path.join(__dirname, 'views'));
+  app.use(express.static(path.join(__dirname, 'views/asset')));
 
-  // static assets served by express.static() for production
- /* app.use(express.static(path.join(__dirname, 'public')));
-  require('./server/routes')(app);*/
-/*  app.listen(port, function () {
-    console.log('App (production) is now running on port 3000!');
-  });*/
+  routers(app, isDev);
+
+  app.listen(port, function () {
+    console.log('running ok!!!')
+  });
 
 }
 
