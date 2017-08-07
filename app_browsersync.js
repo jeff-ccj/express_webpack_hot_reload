@@ -1,10 +1,18 @@
-var express = require('express');
-var path = require('path');
-var reload = require('reload');
-var http = require('http');
-var app = module.exports = express();
-var port = 3000;
-var isDev = process.env.NODE_ENV !== 'production';
+/*
+ * @class   入口文件
+ * @author  Jeff Tsui
+ * @date    2017.8.2
+ */
+
+var express = require('express'),
+  path = require('path'),
+  http = require('http'),
+  reload = require('reload'),
+  config = require('./config'), //配置文件
+  routers = require('./routers/index'), //路由
+  port = config.port, //启动项目端口
+  app = module.exports = express(),
+  isDev = process.env.NODE_ENV !== 'production'; //是否开发模式
 
 app.engine('.html', require('ejs').__express);
 app.set('view engine', 'html');
@@ -29,17 +37,10 @@ if (isDev) {
   }));
   app.use(webpackHotMiddleware(compiler));
 
-  app.get('/', function (req, res) {
-    res.render('page1_index', {
-      title: "page1",
-      page: "page1"
-    });
-  });
-  app.get('/page2', function (req, res) {
-    res.render('page2_index', {
-      title: "page2",
-      page: "page2"
-    });
+
+  routers(app, isDev, {
+    compiler: compiler,
+    dirname: __dirname
   });
 
   // browsersync is a nice choice when modifying only views (with their css & js)
@@ -51,28 +52,20 @@ if (isDev) {
       notify: false,
       proxy: 'localhost:3000',
       files: ['./views/**'],
-      port: 8080
+      port: 8098
     });
-    console.log('App (dev) is going to be running on port 8080 (by browsersync).');
+    console.log('App (dev) is going to be running on port 8098 (by browsersync).');
   });
 
 } else {
+
+  app.set('views', path.join(__dirname, 'views'));
   app.use(express.static(path.join(__dirname, 'views/asset')));
 
-  app.get('/', function (req, res) {
-    res.render('page1_index', {
-      title: "page1",
-      page: "page1"
-    });
-  });
-  app.get('/page2', function (req, res) {
-    res.render('page2_index', {
-      title: "page2",
-      page: "page2"
-    });
-  });
+  routers(app, isDev);
 
   app.listen(port, function () {
-    console.log('App (production) is now running on port 3000!');
+    console.log('running ok!!!')
   });
+
 }

@@ -26,9 +26,9 @@ if (isDev) {
     webpackDevMiddleware = require('webpack-dev-middleware'),
     webpackHotMiddleware = require('webpack-hot-middleware'),
     webpackDevConfig = require('./webpack.config.js');
-
+  //webpack对象
   var compiler = webpack(webpackDevConfig);
-
+  //webpack对象
   app.use(webpackDevMiddleware(compiler, {
     publicPath: webpackDevConfig.output.publicPath,
     noInfo: true,
@@ -73,11 +73,3 @@ if (isDev) {
   });
 
 }
-
-/*
- var server = app.listen(3000, function () {
- var host = server.address().address;
- var port = server.address().port;
-
- console.log('Example app listening at http://%s:%s', host, port);
- });*/

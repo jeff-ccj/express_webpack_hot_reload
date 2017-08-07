@@ -1,3 +1,9 @@
+/*
+ * @class   webpack配置文件
+ * @author  Jeff Tsui
+ * @date    2017.8.2
+ */
+
 var path = require('path'),
   config = require('./config'),
   fs = require('fs'),
